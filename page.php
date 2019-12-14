@@ -1,9 +1,9 @@
 <?php
 session_start();
-error_reporting(0);
-ini_set('display_errors', 0);  
+//selezione registrazione
 if (isset($_POST['reg']))
 	$n=1;
+//selezione login
 if (isset($_POST['log']))
 	$n=2;
 switch($n){
@@ -13,7 +13,8 @@ switch($n){
 	case 1 :
 	//registration
 	$user= $_POST["username"];
-	$_SESSION[$user]=[$_POST["username"],$_POST["pwd"]];
+	$pwd=$_POST["pwd"];
+	$_SESSION[$user]=[$_POST["username"],password_hash($pwd ,PASSWORD_DEFAULT)];
     print_r($_SESSION);
 	echo '<h2>Registrazione finita</h2>';
 	break;
@@ -21,15 +22,28 @@ switch($n){
 	//login
     $user= $_POST["nome"];
 	$password= $_POST["password"];
-	if (in_array($user , $_SESSION[$user])){
+	if (isset($_SESSION[$user])){
 		//nickname esistente
-		if ($password==$_SESSION[$user][1]){
+		if(password_verify($password, $_SESSION[$user][1])){
 			echo '<h2>Ciao ',$user,' <h2/>';
-		}			
+		}
+	// else password errata
+	else{
+		echo '<h2>Password o nome utente errati</h2>';
 	}
+	}
+	// else nome utente errato
 	else {
-		echo '<h2>Password errata</h2>';
+		echo '<h2>Password o nome utente errati</h2>';
 	}
 	break;
 }
+
+$DEBUG=TRUE;
+function myecho($s){
+	global $DEBUG;
+	if($DEBUG){
+		echo $s;
+}}
+
 ?>
